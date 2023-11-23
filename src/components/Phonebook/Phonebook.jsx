@@ -12,30 +12,31 @@ const Phonebook = () => {
     { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
   ];
 
-  const [state, setState] = useState({
-    contacts: initialContacts,
-    filter: '',
-    name: '',
-    number: '',
-  });
+  const [contacts, setContacts] = useState(initialContacts);
+  const [filter, setFilter] = useState('');
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
   const handleChange = e => {
-    setState({
-      ...state,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+      case 'number':
+        setNumber(value);
+        break;
+      default:
+        break;
+    }
   };
 
   const handleSubmit = e => {
     e.preventDefault();
 
-    const { name, number, contacts } = state;
-
-    // Verificăm dacă numele există deja în contacte
     const nameExists = contacts.some(
       contact => contact.name.toLowerCase() === name.toLowerCase()
     );
-
     const numberExists = contacts.some(contact => contact.number === number);
 
     if (nameExists) {
@@ -59,46 +60,37 @@ const Phonebook = () => {
 
     const newContact = {
       id: nanoid(),
-      name: name,
-      number: number,
+      name,
+      number,
     };
 
-    setState({
-      contacts: [...state.contacts, newContact],
-      name: '',
-      number: '',
-      filter: '',
-    });
+    setContacts([...contacts, newContact]);
+    setName('');
+    setNumber('');
+    setFilter('');
   };
 
   const handleFilterChange = e => {
-    setState({
-      ...state,
-      filter: e.target.value,
-    });
+    setFilter(e.target.value);
   };
 
-  const filteredContacts = state.contacts.filter(
+  const filteredContacts = contacts.filter(
     contact =>
-      contact.name.toLowerCase().includes(state.filter.toLowerCase()) ||
-      contact.number.includes(state.filter)
+      contact.name.toLowerCase().includes(filter.toLowerCase()) ||
+      contact.number.includes(filter)
   );
 
   const handleDelete = id => {
-    const updatedContacts = state.contacts.filter(contact => contact.id !== id);
-
-    setState({
-      ...state,
-      contacts: updatedContacts,
-    });
+    const updatedContacts = contacts.filter(contact => contact.id !== id);
+    setContacts(updatedContacts);
   };
 
   return (
     <div>
       <h1>Phonebook</h1>
       <ContactForm
-        name={state.name}
-        number={state.number}
+        name={name}
+        number={number}
         handleChange={handleChange}
         handleSubmit={handleSubmit}
       />
@@ -108,7 +100,7 @@ const Phonebook = () => {
           <input
             type="text"
             name="filter"
-            value={state.filter}
+            value={filter}
             onChange={handleFilterChange}
           />
         </label>
